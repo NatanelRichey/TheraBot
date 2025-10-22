@@ -1,25 +1,33 @@
-# Core ML/AI Dependencies
-transformers>=4.38.0
-torch>=2.1.0
-datasets>=2.16.0
-peft>=0.8.0
-accelerate>=0.26.0
-bitsandbytes>=0.42.0
-sentencepiece>=0.1.99
-protobuf>=3.20.0
+# Core ML and AI libraries
+torch>=2.0.0
+transformers>=4.35.0
+datasets>=2.14.0
+peft>=0.6.0
+accelerate>=0.24.0
+bitsandbytes>=0.41.0
 
-# Backend Dependencies
-fastapi>=0.109.0
-uvicorn[standard]>=0.27.0
-pydantic>=2.5.0
+# Training and fine-tuning
+scikit-learn>=1.3.0
+numpy>=1.24.0
+pandas>=2.0.0
+
+# API and web framework
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.4.0
 python-multipart>=0.0.6
 
-# Utilities
-numpy>=1.24.0
-tqdm>=4.66.0
-python-dotenv>=1.0.0
+# Data processing
+json5>=0.9.0
+pathlib>=1.0.1
 
-# Development
+# Development and utilities
 jupyter>=1.0.0
-notebook>=7.0.0
+ipywidgets>=8.0.0
+tqdm>=4.66.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
 
+# Optional: For advanced features
+sentence-transformers>=2.2.0
+langchain>=0.0.300
