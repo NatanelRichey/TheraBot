@@ -1,0 +1,18 @@
+volume_id,filename,title,exchanges,format,therapist_approach,client_pseudonym,clinical_presentation,source,date_extracted
+01,volume_01_Loretta_-_Interviews_with_Ellis_Felder_a,Loretta - Interviews with Ellis Felder and Rogers,374,json/jsonl,"Albert Ellis (REBT), Richard Felder, Carl Rogers (Client-Centered)",Loretta,Schizophrenia (hospitalized),American Academy of Psychotherapists,2025-10-22
+02,volume_02_19-Year-Old_Male_-_Therapeutic_Relations,19-Year-Old Male - Therapeutic Relationship,482,json/jsonl,Client-Centered,Anonymous 19-year-old male,Development of therapeutic relationship,American Academy of Psychotherapists,2025-10-22
+03,volume_03_Mr_Vac_-_Breaking_Silence,Mr. Vac - Breaking Silence,134,json/jsonl,Client-Centered,Mr. Vac,Depression/withdrawal,American Academy of Psychotherapists,2025-10-22
+05,volume_05_Miss_Mun_-_Impatience_with_Women,Miss Mun - Impatience with Women,123,json/jsonl,Client-Centered,Miss Mun,Interpersonal difficulties with women,American Academy of Psychotherapists,2025-10-22
+06,volume_06_Mr_Lin_-_Homosexuality,Mr. Lin - Homosexuality,153,json/jsonl,Unknown,Mr. Lin,Homosexuality (seeking change),American Academy of Psychotherapists,2025-10-22
+07,volume_07_Life_Goals_and_Ambivalence,Life Goals and Ambivalence,331,json/jsonl,Client-Centered,Anonymous,Ambivalence about life goals,American Academy of Psychotherapists,2025-10-22
+08,volume_08_Mrs_PS_-_Childhood_and_Family,Mrs. P.S. - Childhood and Family,144,json/jsonl,Carl Rogers (Client-Centered),Mrs. P.S.,Childhood and family relationships,American Academy of Psychotherapists,2025-10-22
+09,volume_09_Composite_ABC_-_Anxiety_States,Composite ABC - Anxiety States,210,json/jsonl,Multiple approaches,Composite client,Anxiety states/phobic fears/depersonalization,American Academy of Psychotherapists,2025-10-22
+11,volume_11_John_Jones_-_Homosexuality_Treatment,John Jones - Homosexuality Treatment,552,json/jsonl,Albert Ellis (REBT),John Jones,Fixed homosexual orientation,American Academy of Psychotherapists,2025-10-22
+12,volume_12_Gregg_-_Dream_Analysis,Gregg - Dream Analysis,389,json/jsonl,Psychodynamic/Dream Analysis,Gregg,Dream work and interpretation,American Academy of Psychotherapists,2025-10-22
+13,volume_13_Harry_-_Recording_Anxiety,Harry - Recording Anxiety,414,json/jsonl,Client-Centered,Harry,Anxiety about being recorded,American Academy of Psychotherapists,2025-10-22
+14,volume_14_Jim_-_Paranoid_Episode,Jim - Paranoid Episode,140,json/jsonl,Direct Analysis,Jim,Acute paranoid episode (subsided),American Academy of Psychotherapists,2025-10-22
+17,volume_17_Miss_EST_-_Electroconvulsive_Therapy,Miss EST - Electroconvulsive Therapy,132,json/jsonl,Post-ECT therapy,Miss E.S.T.,Undergoing electroconvulsive therapy,American Academy of Psychotherapists,2025-10-22
+15,volume_15_Don_-_Frustration,Don - Frustration,134,json/jsonl,Client-Centered,Don,Frustration/inability to use intelligence,American Academy of Psychotherapists,2025-10-22
+19,volume_19_Betty_and_Dick_-_Group_Therapy,Betty and Dick - Group Therapy,276,json/jsonl,Group Therapy,Betty and Dick,Religious beliefs/family issues (group session),American Academy of Psychotherapists,2025-10-22
+21,volume_21_Couple_Therapy_-_Whitaker_and_Felder,Couple Therapy - Whitaker and Felder,859,json/jsonl,"Carl Whitaker and Richard Felder (Co-therapy, Family Systems)",Married couple,Couple/marriage therapy,American Academy of Psychotherapists,2025-10-22
+
