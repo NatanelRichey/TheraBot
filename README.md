@@ -1,6 +1,6 @@
-# TheraBot: Therapy Transcript Processing Framework
+# TheraBot: DBT Therapy Chatbot
 
-A comprehensive framework for processing and structuring therapy transcripts into training data for AI models, with a focus on privacy and ethical data handling.
+A complete AI-powered Dialectical Behavior Therapy (DBT) chatbot with web interface, trained on 173,145+ therapy dialogue exchanges. Features a comprehensive data processing framework for creating training data from real therapy sessions, with a focus on privacy and ethical AI development.
 
 ## 🚨 Privacy & Ethics Notice
 
@@ -10,9 +10,25 @@ A comprehensive framework for processing and structuring therapy transcripts int
 - **Legal Compliance**: Source materials are likely copyrighted
 - **Professional Ethics**: Maintains client confidentiality principles
 
-## 📊 Dataset Overview
+## 🤖 TheraBot System
 
-The framework processes **173,145 dialogue exchanges** across **529 therapy sessions** from **92 collections**, including:
+**TheraBot** is a complete DBT therapy chatbot system featuring:
+
+- **Web Interface**: Next.js frontend with responsive chat interface
+- **AI Backend**: FastAPI server with fine-tuned Llama 3.1 8B model
+- **DBT Training**: Specialized in Dialectical Behavior Therapy techniques
+- **Crisis Support**: Built-in crisis detection and resource provision
+- **Privacy-First**: All sensitive data processed locally, never shared publicly
+
+### Technology Stack
+- **Model**: Llama 3.1 8B Instruct (fine-tuned with LoRA)
+- **Backend**: FastAPI + HuggingFace Inference API
+- **Frontend**: Next.js + Tailwind CSS
+- **Deployment**: Vercel (frontend) + HuggingFace Spaces (backend)
+
+## 📊 Training Data Overview
+
+The AI model is trained on **173,145 dialogue exchanges** across **529 therapy sessions** from **92 collections**, including:
 
 - **REBT/CBT**: Rational Emotive Behavior Therapy and Cognitive Behavioral Therapy
 - **Psychoanalytic**: Psychodynamic therapy approaches  
@@ -135,14 +151,28 @@ This framework is designed for research and educational purposes. When contribut
 
 This project is licensed for research and educational use. Users are responsible for ensuring compliance with all applicable laws and regulations regarding therapy data and patient privacy.
 
-## 🔍 Research Applications
+## 🚀 TheraBot Features
 
-The processed data supports various AI research applications:
+### Core DBT Capabilities
+- **Distress Tolerance**: TIPP, PLEASE, and crisis intervention techniques
+- **Emotion Regulation**: Skills for managing intense emotions
+- **Interpersonal Effectiveness**: DEAR MAN, GIVE, FAST communication
+- **Mindfulness**: Present-moment awareness and grounding techniques
 
-- **Therapeutic conversation modeling**
-- **Mental health AI training**
-- **Dialogue system development**
-- **Clinical decision support systems**
+### Technical Features
+- **Crisis Detection**: Automatic identification of self-harm/suicide mentions
+- **Resource Provision**: Direct access to crisis hotlines (988, Crisis Text Line)
+- **Conversation Memory**: Context-aware responses throughout sessions
+- **Mobile Responsive**: Works seamlessly on all devices
+- **Privacy Protection**: No conversation logging, local data processing only
+
+## 🔍 Applications
+
+- **Personal DBT Practice**: 24/7 access to DBT skills and techniques
+- **Crisis Support**: Immediate assistance during emotional distress
+- **Skill Building**: Learn and practice DBT techniques between therapy sessions
+- **Therapist Training**: Help mental health professionals learn DBT approaches
+- **Research Platform**: Study AI-human therapeutic interactions
 
 ## 📞 Contact
 
