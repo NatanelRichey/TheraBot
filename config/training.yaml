@@ -1,0 +1,48 @@
+# Training Environment Configuration
+# Reference: https://huggingface.co/learn/llm-course/chapter3/1
+
+# Model Configuration
+model:
+  name: "meta-llama/Llama-3.1-8B-Instruct"
+  max_length: 2048
+  temperature: 0.7
+  top_p: 0.9
+
+# Training Configuration
+training:
+  batch_size: 2  # Smaller for memory constraints
+  learning_rate: 2e-4
+  num_epochs: 3
+  warmup_steps: 200
+  weight_decay: 0.01
+  gradient_accumulation_steps: 8
+  max_grad_norm: 1.0
+
+# LoRA Configuration
+lora:
+  rank: 16
+  alpha: 32
+  dropout: 0.1
+  target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
+
+# Quantization (for memory efficiency)
+quantization:
+  load_in_4bit: true
+  bnb_4bit_compute_dtype: "float16"
+  bnb_4bit_quant_type: "nf4"
+  bnb_4bit_use_double_quant: true
+
+# Data Configuration
+data:
+  max_samples: -1  # Use all available data
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+
+# Logging
+logging:
+  level: "INFO"
+  log_dir: "logs"
+  save_steps: 100
+  eval_steps: 200
+  logging_steps: 10

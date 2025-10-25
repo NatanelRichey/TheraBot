@@ -1,33 +1,123 @@
-# Core ML and AI libraries
-torch>=2.0.0
-transformers>=4.35.0
-datasets>=2.14.0
-peft>=0.6.0
-accelerate>=0.24.0
-bitsandbytes>=0.41.0
+# TheraBot: DBT Therapy Chatbot Requirements
+# Comprehensive requirements for training, inference, and development
+# Reference: https://huggingface.co/learn/llm-course/chapter3/1
 
-# Training and fine-tuning
-scikit-learn>=1.3.0
-numpy>=1.24.0
-pandas>=2.0.0
+# =============================================================================
+# CORE ML AND AI LIBRARIES
+# =============================================================================
+# Essential libraries for model training and inference
+torch>=2.0.0,<2.2.0
+transformers>=4.35.0,<4.40.0
+datasets>=2.14.0,<2.18.0
+peft>=0.6.0,<0.8.0
+accelerate>=0.24.0,<0.27.0
+bitsandbytes>=0.41.0,<0.44.0
 
-# API and web framework
-fastapi>=0.104.0
-uvicorn>=0.24.0
-pydantic>=2.4.0
-python-multipart>=0.0.6
+# =============================================================================
+# TRAINING AND FINE-TUNING
+# =============================================================================
+# Machine learning and data science libraries
+scikit-learn>=1.3.0,<1.4.0
+numpy>=1.24.0,<1.26.0
+pandas>=2.0.0,<2.2.0
 
-# Data processing
-json5>=0.9.0
-pathlib>=1.0.1
+# Data processing and tokenization
+# Reference: https://huggingface.co/docs/transformers/main/en/tokenizer_summary
+tokenizers>=0.15.0,<0.16.0
+sentencepiece>=0.1.99,<0.2.0
 
-# Development and utilities
-jupyter>=1.0.0
-ipywidgets>=8.0.0
-tqdm>=4.66.0
-matplotlib>=3.7.0
-seaborn>=0.12.0
+# Training monitoring and evaluation
+# Reference: https://huggingface.co/docs/evaluate/
+evaluate>=0.4.0,<0.5.0
+wandb>=0.15.0,<0.17.0
+tensorboard>=2.14.0,<2.16.0
 
-# Optional: For advanced features
-sentence-transformers>=2.2.0
-langchain>=0.0.300
+# Performance optimization
+# Reference: https://huggingface.co/docs/transformers/main/en/performance
+flash-attn>=2.3.0,<2.6.0  # Optional, for faster training
+
+# =============================================================================
+# API AND WEB FRAMEWORK
+# =============================================================================
+# FastAPI backend for production deployment
+fastapi>=0.104.0,<0.110.0
+uvicorn[standard]>=0.24.0,<0.26.0
+pydantic>=2.4.0,<2.6.0
+python-multipart>=0.0.6,<0.1.0
+
+# =============================================================================
+# DATA PROCESSING
+# =============================================================================
+# Data handling and processing utilities
+json5>=0.9.0,<0.10.0
+pathlib>=1.0.1,<2.0.0
+
+# Data validation and quality
+jsonschema>=4.19.0,<4.21.0
+
+# =============================================================================
+# INFERENCE OPTIMIZATION
+# =============================================================================
+# Memory optimization for inference
+# Reference: https://huggingface.co/docs/transformers/main/en/performance
+optimum>=1.14.0,<1.17.0
+onnxruntime>=1.16.0,<1.18.0  # Optional, for ONNX optimization
+
+# =============================================================================
+# DEVELOPMENT AND UTILITIES
+# =============================================================================
+# Jupyter and notebooks
+jupyter>=1.0.0,<1.1.0
+jupyterlab>=4.0.0,<4.1.0
+ipywidgets>=8.0.0,<9.0.0
+nbconvert>=7.7.0,<7.9.0
+
+# Progress and visualization
+tqdm>=4.66.0,<4.67.0
+matplotlib>=3.7.0,<3.9.0
+seaborn>=0.12.0,<0.14.0
+
+# System monitoring
+psutil>=5.9.0,<5.10.0
+GPUtil>=1.4.0,<1.5.0
+
+# =============================================================================
+# DEVELOPMENT TOOLS (OPTIONAL)
+# =============================================================================
+# Uncomment these for development environment
+# Testing and quality assurance
+# pytest>=7.4.0,<8.0.0
+# pytest-asyncio>=0.21.0,<0.24.0
+# pytest-cov>=4.1.0,<4.2.0
+
+# Code formatting and linting
+# black>=23.0.0,<24.0.0
+# isort>=5.12.0,<5.14.0
+# flake8>=6.0.0,<7.0.0
+# mypy>=1.5.0,<1.8.0
+
+# Documentation
+# sphinx>=7.1.0,<7.3.0
+# sphinx-rtd-theme>=1.3.0,<1.4.0
+
+# Security and quality
+# pre-commit>=3.4.0,<3.6.0
+# bandit>=1.7.0,<1.8.0
+# safety>=2.3.0,<2.4.0
+
+# =============================================================================
+# ADVANCED FEATURES (OPTIONAL)
+# =============================================================================
+# Uncomment these for advanced features
+# Vector embeddings and RAG
+# sentence-transformers>=2.2.0,<2.3.0
+# langchain>=0.0.300,<0.1.0
+
+# =============================================================================
+# INSTALLATION NOTES
+# =============================================================================
+# 1. Core installation: pip install -r requirements.txt
+# 2. For development: Uncomment development tools section
+# 3. For advanced features: Uncomment advanced features section
+# 4. GPU support: Ensure CUDA-compatible PyTorch installation
+# 5. Memory optimization: Use 4-bit quantization for large models

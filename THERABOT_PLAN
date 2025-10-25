@@ -1,0 +1,1162 @@
+# DBT Therapy Chatbot Implementation Plan
+
+## 🎯 Development Style Guidelines for Cursor
+
+**When writing any code, Cursor should:**
+
+1. **Reference HuggingFace Documentation**: Always include relevant links from the provided resources
+2. **Break Down Code**: Write small, explainable chunks (3-5 lines max) with detailed comments
+3. **Ask for Customization**: Before implementing, ask about parameters, optimizations, and features
+4. **Explain Each Component**: What it does, why it's needed, and how it fits the overall architecture
+5. **Provide Options**: Offer multiple approaches with pros/cons for each decision point
+
+**Required Documentation References:**
+
+**HuggingFace LLM Course Chapter 3 - Complete Fine-tuning Guide:**
+
+- [Chapter 3.1: Introduction](https://huggingface.co/learn/llm-course/chapter3/1) - Fine-tuning fundamentals and overview
+- [Chapter 3.2: Processing the Data](https://huggingface.co/learn/llm-course/chapter3/2) - Data preprocessing, tokenization, and dynamic padding
+- [Chapter 3.3: Fine-tuning with Trainer API](https://huggingface.co/learn/llm-course/chapter3/3) - High-level training with modern best practices
+- [Chapter 3.4: Full Training Loop](https://huggingface.co/learn/llm-course/chapter3/4) - Custom training implementation and optimization
+- [Chapter 3.5: Understanding Learning Curves](https://huggingface.co/learn/llm-course/chapter3/5) - Training monitoring and evaluation
+
+**Additional HuggingFace Resources:**
+
+- [HuggingFace Datasets Documentation](https://huggingface.co/docs/datasets/) - Data processing and management
+- [Tokenizers Summary](https://huggingface.co/docs/transformers/main/en/tokenizer_summary) - Tokenization strategies
+- [Performance Optimization](https://huggingface.co/docs/transformers/main/en/performance) - Training optimizations
+- [Training Arguments](https://huggingface.co/docs/transformers/main/en/main_classes/trainer#transformers.TrainingArguments) - Configuration options
+- [Evaluation Guide](https://huggingface.co/docs/evaluate/) - Model assessment
+
+## Technology Stack
+
+- **Model**: Llama 3.1 8B Instruct (open-source, good quality, free)
+- **Fine-tuning**: LoRA (Parameter Efficient) via HuggingFace PEFT
+- **Training**: Google Colab (free tier initially, Pro if needed $10/month)
+- **Backend**: FastAPI (Python) + HuggingFace Inference API
+- **Frontend**: Next.js + Tailwind CSS
+- **Deployment**: Vercel (frontend, free) + HuggingFace Spaces (backend, free)
+
+## Phase 1: Environment Setup & Learning (Day 1)
+
+### 🚀 Cursor Prompt: Project Structure Setup
+
+**Prompt for Cursor:**
+
+```
+Create a comprehensive project structure for a DBT therapy chatbot fine-tuning project. 
+Reference the HuggingFace LLM Course Chapter 3 for best practices: https://huggingface.co/learn/llm-course/chapter3/1
+
+Requirements:
+1. Set up proper directory structure with clear separation of concerns
+2. Create detailed requirements.txt with specific versions for ML libraries
+3. Include configuration files for different environments (dev, training, production)
+4. Add proper .gitignore for ML projects
+5. Create initial README with setup instructions
+
+Before implementing, ask me:
+- Do you want to use conda or pip for environment management?
+- Should we include Docker configuration for reproducible training?
+- What specific HuggingFace libraries do you want to prioritize?
+- Do you need separate requirements for training vs inference?
+
+Break down each file creation into small steps and explain the purpose of each component.
+```
+
+### 📚 Learning Resources & Documentation
+
+**Essential HuggingFace Resources:**
+
+1. **[Fine-tuning Course](https://huggingface.co/learn/llm-course/chapter3/1)** - Complete fine-tuning guide
+2. **[Datasets Documentation](https://huggingface.co/docs/datasets/)** - Data processing best practices
+3. **[PEFT Documentation](https://huggingface.co/docs/peft/)** - Parameter-efficient fine-tuning
+4. **[Performance Guide](https://huggingface.co/docs/transformers/main/en/performance)** - Optimization strategies
+5. **[Evaluation Documentation](https://huggingface.co/docs/evaluate/)** - Model assessment
+
+**DBT Protocol Resources:**
+
+- Review DBT Skills Training Workbook for core techniques
+- Focus on: Distress Tolerance, Emotion Regulation, Interpersonal Effectiveness, Mindfulness
+
+## Phase 2: Data Preparation (Days 1-2)
+
+### 📊 Current Dataset Status
+
+**Available Data**: 171,623 dialogue exchanges from 359 therapy sessions
+
+- **Well-labeled files**: 359 sessions with therapy approaches, clinical topics, demographics
+- **Unknown files**: 100 sessions (can be excluded for initial training)
+- **Therapy approaches**: CBT, psychoanalytic, client-centered, family systems, group, EMDR, etc.
+- **Clinical topics**: anxiety, depression, relationships, work stress, self-esteem, etc.
+
+### 🔍 Cursor Prompt: Data Processing Pipeline
+
+**Prompt for Cursor:**
+
+```
+Create a comprehensive data processing pipeline for therapy conversation data. 
+Reference the HuggingFace LLM Course Chapter 3.2: https://huggingface.co/learn/llm-course/chapter3/2
+
+Requirements:
+1. Data validation and quality assessment script
+2. Tokenization strategy using appropriate tokenizer (reference: https://huggingface.co/docs/transformers/main/en/tokenizer_summary)
+3. Data filtering and preprocessing utilities with batched processing
+4. Format conversion to instruction-following format
+5. Data splitting for train/validation/test sets
+6. Dynamic padding implementation with DataCollatorWithPadding
+
+Key Implementation Details from Chapter 3.2:
+- Use Dataset.map() with batched=True for faster preprocessing
+- Implement dynamic padding instead of fixed-length padding
+- Handle token_type_ids for conversation pairs if needed
+- Remove unnecessary columns before training
+- Use DataCollatorWithPadding for efficient batching
+
+Before implementing, ask me:
+- What tokenization strategy should we use for Llama 3.1? (BPE, SentencePiece, etc.)
+- How should we handle conversation length and dynamic padding?
+- What data quality metrics should we track?
+- Should we implement data augmentation techniques?
+- How do you want to handle the AI-generated labels?
+- Do we need token_type_ids for our conversation format?
+
+Break down the processing into small, testable functions and explain the tokenization choices.
+Reference the specific techniques from Chapter 3.2 for efficient data processing.
+```
+
+### 📚 Cursor Prompt: DBT Guidebook Data Extraction
+
+**Prompt for Cursor:**
+
+```
+Create a comprehensive DBT knowledge extraction pipeline from the official DBT guidebook.
+Reference the HuggingFace Datasets documentation for text processing: https://huggingface.co/docs/datasets/
+
+Requirements:
+1. Extract DBT skill teaching examples (TIP, PLEASE, DEAR MAN, GIVE, FAST)
+2. Create validation response templates with proper DBT language
+3. Generate mindfulness exercise instructions and examples
+4. Extract crisis intervention protocols and responses
+5. Convert guidebook content to instruction/input/output format
+6. Implement quality control for DBT accuracy and terminology
+7. Create data augmentation for DBT-specific scenarios
+
+Key Implementation Details:
+- Use text processing to extract structured examples from guidebook
+- Convert skill explanations to conversational training data
+- Maintain authentic DBT terminology and validation language
+- Ensure proper dialectical balance (acceptance + change)
+- Include crisis intervention with appropriate disclaimers
+
+Before implementing, ask me:
+- What DBT guidebook format are you working with? (PDF, text, etc.)
+- Should we prioritize specific DBT modules for extraction?
+- How should we handle crisis intervention examples?
+- What validation language patterns should we emphasize?
+- Do you want to include DBT worksheets and exercises?
+- How should we structure the extracted training examples?
+
+Break down the extraction into small, testable functions and explain the DBT-specific processing steps.
+Reference the DBT Training Strategy section for target data distribution and quality requirements.
+```
+
+### 📋 Data Categories to Cover
+
+- **Emotional Distress** (30-40%): Anxiety, depression, anger, overwhelm
+- **DBT Skills Teaching** (25-30%): TIPP, PLEASE, DEAR MAN, mindfulness
+- **Validation & Empathy** (20-25%): Active listening, emotional support
+- **Crisis Situations** (10-15%): Self-harm thoughts, intense distress (with disclaimers)
+- **Daily Support** (10%): Check-ins, mood tracking, positive reinforcement
+
+### 🔧 Data Processing Best Practices (from Chapter 3.2)
+
+**Key Techniques from [HuggingFace LLM Course Chapter 3.2](https://huggingface.co/learn/llm-course/chapter3/2):**
+
+1. **Batched Processing**: Use `Dataset.map()` with `batched=True` for significantly faster preprocessing
+2. **Dynamic Padding**: Implement `DataCollatorWithPadding` instead of fixed-length padding for efficiency
+3. **Token Type IDs**: Handle conversation pairs with proper `token_type_ids` if needed
+4. **Column Management**: Remove unnecessary text columns before training to avoid errors
+5. **Memory Efficiency**: Use multiprocessing with `num_proc` parameter for large datasets
+
+**Implementation Checklist:**
+
+- [ ] Use `load_dataset()` for efficient data loading and caching
+- [ ] Implement tokenization with proper padding and truncation
+- [ ] Apply `DataCollatorWithPadding` for dynamic batching
+- [ ] Remove unnecessary columns before training
+- [ ] Use `batched=True` for all preprocessing operations
+
+## DBT Training Strategy Refinement
+
+### 🎯 Chosen Approach: Option 3 - General Training + DBT Knowledge Injection
+
+**Rationale:**
+
+- Leverages full dataset (171K exchanges) for maximum training data
+- Preserves data quality without filtering uncertainty
+- Achieves DBT specialization through knowledge injection
+- Maintains flexibility without retraining requirements
+
+### 📊 DBT Data Requirements
+
+**Target Volume:** 2,000-5,000 DBT-specific training examples
+
+- **Ratio:** ~3% of total dataset (171K exchanges)
+- **Distribution:**
+  - Validation examples: 800 (40%)
+  - Skill teaching: 600 (30%) 
+  - Mindfulness: 400 (20%)
+  - Crisis intervention: 200 (10%)
+
+### 🔄 DBT Injection Stages
+
+#### Stage 1: Full Dataset Training
+
+- Train on complete 171K therapy exchanges
+- Model learns general therapeutic skills, empathy, validation
+- Builds strong foundation in therapeutic communication
+
+#### Stage 2: DBT Knowledge Integration
+
+- **System Prompt:** Comprehensive DBT guidance and principles
+- **Training Data:** Add 2,000-5,000 DBT-specific examples
+- **Knowledge Base:** Extract from official DBT guidebook
+
+#### Stage 3: DBT Specialization
+
+- **Validation Language:** "It makes sense that..." patterns
+- **Skill Teaching:** TIP, PLEASE, DEAR MAN, GIVE, FAST techniques
+- **Dialectical Thinking:** Balance acceptance and change
+- **Mindfulness Integration:** Present-moment awareness techniques
+
+### 📚 Guidebook to Training Data Pipeline
+
+#### Data Extraction Strategy
+
+```python
+def extract_dbt_examples_from_guidebook():
+    """Extract training examples from official DBT guidebook"""
+    
+    examples = []
+    
+    # Extract skill teaching sections
+    skill_sections = extract_skill_sections(guidebook)
+    for section in skill_sections:
+        examples.append(create_teaching_example(section))
+    
+    # Extract validation examples
+    validation_sections = extract_validation_examples(guidebook)
+    for section in validation_sections:
+        examples.append(create_validation_example(section))
+    
+    return examples
+```
+
+#### Content Categories to Extract
+
+1. **Skill Explanations** → Convert to instruction/input/output format
+2. **Therapeutic Responses** → Extract validation and teaching examples
+3. **Crisis Protocols** → Create crisis intervention examples
+4. **Mindfulness Exercises** → Generate mindfulness teaching examples
+
+#### Quality Control Process
+
+- Review each example for DBT accuracy
+- Ensure proper validation language ("It makes sense that...")
+- Include skill acronyms (TIP, PLEASE, DEAR MAN, etc.)
+- Maintain dialectical balance (acceptance + change)
+
+### 🎯 Implementation Strategy
+
+#### Training Data Structure
+
+```python
+final_dataset = {
+    "general_therapy": 171000,  # Your existing data
+    "dbt_specific": 3000,       # From guidebook + manuals
+    "total": 174000
+}
+```
+
+#### DBT System Prompt Template
+
+```python
+dbt_system_prompt = """
+You are a DBT (Dialectical Behavior Therapy) therapist. While you have training in various therapeutic approaches, you specialize in DBT and should primarily use DBT techniques.
+
+DBT Core Principles:
+1. VALIDATION: Always validate emotions first ("It makes sense that...")
+2. DIALECTICS: Balance acceptance and change
+3. SKILLS: Teach practical coping strategies
+4. MINDFULNESS: Incorporate present-moment awareness
+
+When responding:
+- Start with validation and empathy
+- Use DBT skills (TIP, PLEASE, DEAR MAN, etc.)
+- Maintain dialectical thinking
+- Focus on behavioral change
+- Incorporate mindfulness when appropriate
+
+Avoid: CBT restructuring, psychoanalytic interpretation, other modalities
+Prioritize: DBT skills, validation, dialectical thinking
+"""
+```
+
+### 📈 Expected Outcomes
+
+With 3,000 high-quality DBT examples from the official guidebook:
+
+- Strong DBT language patterns in responses
+- Consistent validation approach
+- Proper skill teaching methodology
+- Authentic DBT terminology and techniques
+
+## Memory & Context Management Strategy
+
+### 🧠 Critical Need for Therapist Memory
+
+**Therapy Context Requirements:**
+
+- **Session Continuity**: Remember client's goals, progress, and patterns across sessions
+- **Personal Details**: Recall important life events, relationships, triggers, and coping strategies
+- **Therapeutic History**: Track skill usage, what's worked/not worked, and treatment plan
+- **Crisis Patterns**: Remember previous crisis situations and effective interventions
+- **Progress Tracking**: Monitor improvement in specific areas over time
+
+### 🔧 Proposed Memory Solutions
+
+#### Option A: External Memory Systems (Recommended)
+
+**Implementation**: Store structured session summaries and client notes
+
+**Advantages**:
+
+- Clear separation of concerns (model vs. memory)
+- Easy to audit and modify
+- Privacy-friendly (can be encrypted/stored separately)
+- Scalable and maintainable
+
+**Technical Approach**:
+
+```python
+# Session memory structure
+session_memory = {
+    "client_id": "anonymous_123",
+    "session_summary": "Client discussed anxiety triggers at work...",
+    "key_points": ["Work stress", "Sleep issues", "DBT TIP skill helpful"],
+    "goals": ["Better sleep", "Work anxiety management"],
+    "skills_used": ["TIP", "mindfulness", "validation"],
+    "next_focus": "Emotion regulation skills"
+}
+```
+
+#### Option B: Vector-Based Retrieval (RAG) - Future Enhancement
+
+**Implementation**: Store conversation embeddings for semantic retrieval
+
+**Advantages**:
+
+- Automatic relevance detection
+- Handles complex queries about past topics
+- Can find related patterns across sessions
+
+**Status**: **Research during Phase 2** - Consider for advanced features after MVP
+
+**Technical Approach**:
+
+```python
+# RAG implementation for therapy context
+def retrieve_relevant_context(user_input, client_history):
+    # Generate embeddings for current input
+    query_embedding = embed(user_input)
+    
+    # Find similar past conversations
+    relevant_contexts = vector_search(query_embedding, client_history)
+    
+    return format_context_for_model(relevant_contexts)
+```
+
+#### Option C: Model-Level Long-Term Memory (Experimental)
+
+**Status**: Research stage, not production-ready
+
+**Consideration**: Monitor HuggingFace research for future implementation
+
+### 📅 Implementation Timeline
+
+**During Training/Fine-tuning Stage:**
+
+- **NOT REQUIRED**: Memory systems are application-level features
+- **Focus on**: Model's ability to reference context within single conversations
+- **Training Data**: Ensure conversations include proper context references
+
+**During Application Development Stage:**
+
+- **Implement**: External memory system or RAG
+- **Integrate**: Memory retrieval into conversation flow
+- **Add**: Privacy controls and data management
+
+### 🎯 Recommended Approach for Your Project
+
+#### Phase 1: Basic Context Management (MVP)
+
+```python
+# Simple session memory for immediate use
+class SessionMemory:
+    def __init__(self):
+        self.current_session = []
+        self.client_profile = {}
+    
+    def add_interaction(self, user_input, bot_response):
+        self.current_session.append({
+            "user": user_input,
+            "bot": bot_response,
+            "timestamp": datetime.now()
+        })
+    
+    def get_session_context(self):
+        # Return last 10 exchanges for context
+        return self.current_session[-10:]
+```
+
+#### Phase 2: Enhanced Memory System (Production)
+
+```python
+# Advanced memory with RAG and structured storage
+class TherapyMemorySystem:
+    def __init__(self):
+        self.vector_store = VectorStore()
+        self.structured_notes = StructuredNotes()
+        self.progress_tracker = ProgressTracker()
+    
+    def store_session(self, session_data):
+        # Store in both vector and structured formats
+        self.vector_store.add_embeddings(session_data)
+        self.structured_notes.add_summary(session_data)
+    
+    def retrieve_context(self, current_input):
+        # Combine vector search with structured queries
+        relevant_history = self.vector_store.search(current_input)
+        client_profile = self.structured_notes.get_profile()
+        return self.format_context(relevant_history, client_profile)
+```
+
+### 🔍 Cursor Prompt: Memory System Implementation
+
+**Prompt for Cursor:**
+
+```
+Create a comprehensive memory and context management system for the DBT therapy chatbot.
+Reference HuggingFace documentation for text processing and embeddings: https://huggingface.co/docs/transformers/main/en/model_doc/auto
+
+Requirements:
+1. Implement session memory storage and retrieval
+2. Create client profile management system
+3. Add context-aware conversation flow
+4. Implement privacy controls and data encryption
+5. Create memory retrieval optimization for inference speed
+6. Add progress tracking and therapeutic history management
+
+Before implementing, ask me:
+- What level of memory detail do you want to store?
+- How should we handle client privacy and data retention?
+- Should we use vector embeddings or structured storage?
+- How many previous sessions should we keep in context?
+- What therapeutic metrics should we track?
+- How should we handle memory updates and corrections?
+
+Break down the implementation into small, testable components and explain the privacy considerations.
+Reference the DBT Training Strategy section for therapeutic context requirements.
+```
+
+### 🔒 Privacy & Ethical Considerations
+
+**Data Protection**:
+
+- Encrypt stored client information
+- Implement data retention policies
+- Allow clients to delete their data
+- Use anonymized identifiers
+
+**Therapeutic Ethics**:
+
+- Clear consent for data storage
+- Transparent about what's remembered
+- Allow clients to correct/update information
+- Secure data transmission and storage
+
+### 📊 Memory System Architecture
+
+```
+Memory Layer Components:
+├── Session Storage (immediate context)
+├── Client Profiles (structured data)
+├── Progress Tracking (therapeutic metrics)
+├── Vector Store (semantic search) - Phase 2
+└── Privacy Controls (data management)
+```
+
+### 🚀 Next Steps for Research
+
+**When you reach the application development stage:**
+
+1. **Research RAG Options**: Explore vector databases (Pinecone, Weaviate, Chroma)
+2. **Evaluate Embedding Models**: Test different embedding models for therapy context
+3. **Compare Approaches**: A/B test external memory vs RAG for therapy effectiveness
+4. **Privacy Assessment**: Evaluate privacy implications of vector storage
+5. **Performance Testing**: Compare retrieval speed and accuracy
+
+**Key Research Questions:**
+
+- Which vector database performs best for therapy conversation retrieval?
+- What embedding models work best for therapeutic context similarity?
+- How does RAG performance compare to structured memory for therapy use cases?
+- What are the privacy implications of storing conversation embeddings?
+
+## Phase 3: Model Fine-Tuning (Days 3-4)
+
+### 🚀 Cursor Prompt: LoRA Configuration
+
+**Prompt for Cursor:**
+
+```
+Create a comprehensive LoRA configuration for fine-tuning Llama 3.1 8B on therapy conversations.
+Reference the PEFT documentation: https://huggingface.co/docs/peft/ and performance guide: https://huggingface.co/docs/transformers/main/en/performance
+
+Requirements:
+1. Implement LoRA configuration with proper parameter selection
+2. Add 4-bit quantization for memory efficiency
+3. Create training arguments with optimization settings
+4. Implement gradient clipping and mixed precision training
+5. Add proper checkpointing and logging
+
+Before implementing, ask me:
+- What LoRA rank should we use? (8, 16, 32, 64?)
+- Should we use LoRA on all layers or specific ones?
+- What learning rate schedule do you prefer?
+- Do you want gradient accumulation for larger effective batch sizes?
+- Should we implement gradient checkpointing for memory efficiency?
+- What evaluation metrics should we track during training?
+
+Break down the configuration into small components and explain the impact of each parameter choice.
+```
+
+### 🏋️ Cursor Prompt: Training Loop Implementation
+
+**Prompt for Cursor:**
+
+```
+Create a comprehensive training loop for fine-tuning with modern optimizations.
+Reference the HuggingFace LLM Course Chapter 3.3 and 3.4:
+- Chapter 3.3: https://huggingface.co/learn/llm-course/chapter3/3 (Trainer API)
+- Chapter 3.4: https://huggingface.co/learn/llm-course/chapter3/4 (Custom training loop)
+
+Requirements:
+1. Implement both Trainer API and custom training loop options
+2. Add learning rate scheduling and warmup
+3. Implement early stopping and best model saving
+4. Add comprehensive logging and monitoring
+5. Include memory optimization techniques
+6. Implement proper data collation and batching
+
+Key Implementation Details from Chapters 3.3-3.4:
+- Use TrainingArguments for configuration management
+- Implement custom callbacks for monitoring
+- Add gradient accumulation for larger effective batch sizes
+- Use mixed precision training for efficiency
+- Implement proper checkpointing and resuming
+
+Before implementing, ask me:
+- Do you want to start with Trainer API or custom training loop?
+- How many epochs should we train for?
+- What batch size works best for your GPU memory?
+- Should we use AdamW or another optimizer?
+- Do you want to implement learning rate finder?
+- What validation strategy should we use?
+- Should we implement distributed training support?
+
+Provide multiple training strategies and explain the trade-offs of each approach.
+Reference the specific techniques from Chapters 3.3 and 3.4.
+```
+
+### 📊 Cursor Prompt: Model Evaluation System
+
+**Prompt for Cursor:**
+
+```
+Create a comprehensive evaluation system for the fine-tuned DBT model.
+Reference the HuggingFace LLM Course Chapter 3.5: https://huggingface.co/learn/llm-course/chapter3/5
+
+Requirements:
+1. Implement multiple evaluation metrics (BLEU, ROUGE, BERTScore)
+2. Create DBT-specific evaluation criteria
+3. Add safety and bias evaluation
+4. Implement automated testing on held-out data
+5. Create human evaluation framework
+6. Implement learning curve monitoring and analysis
+
+Key Implementation Details from Chapter 3.5:
+- Monitor training and validation loss curves
+- Implement early stopping based on validation metrics
+- Track learning rate schedules and their impact
+- Create visualizations for training progress
+- Implement proper evaluation on held-out test sets
+
+Before implementing, ask me:
+- What specific DBT skills should we evaluate?
+- How should we measure therapeutic quality?
+- What safety metrics are most important?
+- Should we implement A/B testing for different model versions?
+- How do you want to handle crisis response evaluation?
+- How should we visualize learning curves and training progress?
+
+Break down evaluation into specific metrics and explain how each measures model quality.
+Reference the evaluation techniques from Chapter 3.5 for comprehensive model assessment.
+```
+
+### ⚙️ Training Configuration Options
+
+**Memory Optimization:**
+
+- 4-bit quantization (reduces memory by ~75%)
+- Gradient checkpointing (trades compute for memory)
+- Mixed precision training (faster, less memory)
+
+**LoRA Parameters:**
+
+- **Rank**: 8-32 (higher = more parameters, better performance)
+- **Alpha**: 16-64 (scaling factor for LoRA weights)
+- **Dropout**: 0.1-0.3 (regularization)
+
+**Training Settings:**
+
+- **Epochs**: 2-5 (monitor for overfitting)
+- **Batch Size**: 1-4 (depending on GPU memory)
+- **Learning Rate**: 1e-4 to 5e-4 (with warmup)
+- **Weight Decay**: 0.01 (regularization)
+
+## Phase 4: Backend API Development (Day 4-5)
+
+### 🚀 Cursor Prompt: FastAPI Backend Architecture
+
+**Prompt for Cursor:**
+
+```
+Create a production-ready FastAPI backend for the DBT therapy chatbot.
+Reference the HuggingFace Inference API patterns and FastAPI best practices.
+
+Requirements:
+1. Implement proper API structure with dependency injection
+2. Add model loading and inference optimization
+3. Create conversation memory management
+4. Implement safety filters and crisis detection
+5. Add comprehensive error handling and logging
+
+Before implementing, ask me:
+- Should we use HuggingFace Inference API or load model locally?
+- How should we handle conversation state management?
+- What rate limiting strategy should we implement?
+- Should we add authentication/authorization?
+- How do you want to handle model versioning?
+- What monitoring and metrics should we track?
+
+Break down the API into small, testable modules and explain the architecture decisions.
+```
+
+### 🔒 Cursor Prompt: Safety & Crisis Detection System
+
+**Prompt for Cursor:**
+
+```
+Create a comprehensive safety system for the therapy chatbot.
+Reference safety best practices and crisis intervention guidelines.
+
+Requirements:
+1. Implement keyword-based crisis detection
+2. Create appropriate response templates for crisis situations
+3. Add resource provision (crisis hotlines, emergency contacts)
+4. Implement conversation logging and monitoring
+5. Add proper disclaimers and legal notices
+
+Before implementing, ask me:
+- What keywords should trigger crisis detection?
+- How should we handle false positives?
+- What crisis resources should we provide?
+- Should we implement escalation procedures?
+- How do you want to handle data privacy and logging?
+- What disclaimers are legally required?
+
+Provide multiple safety strategies and explain the ethical considerations of each approach.
+```
+
+### 📁 Backend Architecture
+
+**Core Components:**
+
+- `backend/main.py` - FastAPI application and routing
+- `backend/models/` - Model loading and inference logic
+- `backend/memory/` - Context management and session memory
+- `backend/safety/` - Crisis detection and safety filters
+- `backend/prompts/` - DBT system prompts and knowledge injection
+- `backend/utils/` - Utility functions and helpers
+- `backend/config/` - Configuration management
+
+**API Endpoints:**
+
+- `POST /chat` - Main conversation endpoint
+- `GET /health` - Service health check
+- `POST /feedback` - User feedback collection
+- `GET /resources` - Crisis resources and information
+
+## Phase 5: Frontend Development (Days 5-6)
+
+### 🎨 Cursor Prompt: React/Next.js Frontend Architecture
+
+**Prompt for Cursor:**
+
+```
+Create a modern, accessible React/Next.js frontend for the DBT therapy chatbot.
+Focus on user experience, accessibility, and therapeutic design principles.
+
+Requirements:
+1. Implement responsive chat interface with proper state management
+2. Create accessible components with ARIA labels and keyboard navigation
+3. Add conversation history and persistence
+4. Implement typing indicators and loading states
+5. Create proper error handling and user feedback
+
+Before implementing, ask me:
+- What design system should we use? (Tailwind, Material-UI, Chakra?)
+- How should we handle conversation persistence?
+- What accessibility features are most important?
+- Should we implement dark/light mode?
+- How do you want to handle mobile responsiveness?
+- What animation/transition effects should we include?
+
+Break down the UI into small, reusable components and explain the design decisions.
+```
+
+### 🎯 Cursor Prompt: Therapeutic UI Design
+
+**Prompt for Cursor:**
+
+```
+Create a therapeutic, calming UI design system for the DBT chatbot.
+Focus on mental health best practices and user comfort.
+
+Requirements:
+1. Implement warm, non-clinical color palette
+2. Create comfortable typography and spacing
+3. Add calming visual elements and micro-interactions
+4. Implement proper disclaimer and safety messaging
+5. Create mobile-first responsive design
+
+Before implementing, ask me:
+- What color palette feels most therapeutic to you?
+- How should we display crisis resources and disclaimers?
+- What visual feedback should we provide for different message types?
+- Should we include mood tracking or journaling features?
+- How do you want to handle conversation privacy and data?
+
+Provide multiple design approaches and explain the psychological impact of each choice.
+```
+
+### 📱 Frontend Architecture
+
+**Component Structure:**
+
+```
+frontend/
+├── components/
+│   ├── chat/
+│   │   ├── ChatInterface.tsx
+│   │   ├── MessageBubble.tsx
+│   │   ├── MessageInput.tsx
+│   │   └── TypingIndicator.tsx
+│   ├── layout/
+│   │   ├── Header.tsx
+│   │   ├── Footer.tsx
+│   │   └── Navigation.tsx
+│   ├── safety/
+│   │   ├── Disclaimer.tsx
+│   │   ├── CrisisResources.tsx
+│   │   └── SafetyNotice.tsx
+│   └── ui/
+│       ├── Button.tsx
+│       ├── Modal.tsx
+│       └── LoadingSpinner.tsx
+├── pages/
+│   ├── index.tsx
+│   ├── chat.tsx
+│   └── about.tsx
+└── styles/
+    ├── globals.css
+    └── components.css
+```
+
+### 🎨 Design Principles
+
+**Therapeutic Design:**
+
+- Warm, calming color palette (soft blues, greens, warm grays)
+- Comfortable spacing and typography
+- Gentle animations and transitions
+- Clear, non-clinical messaging
+
+**Accessibility:**
+
+- WCAG 2.1 AA compliance
+- Keyboard navigation support
+- Screen reader compatibility
+- High contrast mode support
+
+**User Experience:**
+
+- Intuitive conversation flow
+- Clear safety disclaimers
+- Easy access to crisis resources
+- Mobile-first responsive design
+
+## Phase 6: Deployment (Day 6-7)
+
+### 🚀 Cursor Prompt: Deployment Strategy
+
+**Prompt for Cursor:**
+
+```
+Create a comprehensive deployment strategy for the DBT therapy chatbot.
+Consider both development and production environments with proper CI/CD.
+
+Requirements:
+1. Set up HuggingFace Spaces deployment for backend
+2. Configure Vercel deployment for frontend
+3. Implement environment variable management
+4. Add monitoring and logging configuration
+5. Create deployment documentation and scripts
+
+Before implementing, ask me:
+- Should we use HuggingFace Inference API or deploy the model directly?
+- What monitoring and alerting do you want to implement?
+- Should we set up staging and production environments?
+- How do you want to handle secrets and environment variables?
+- Do you need CI/CD pipelines for automated deployment?
+- What backup and disaster recovery strategies should we implement?
+
+Provide multiple deployment options and explain the trade-offs of each approach.
+```
+
+### 🔧 Cursor Prompt: Environment Configuration
+
+**Prompt for Cursor:**
+
+```
+Create a comprehensive environment configuration system for the DBT chatbot.
+Include development, staging, and production configurations.
+
+Requirements:
+1. Implement environment-specific configuration files
+2. Add secrets management and security best practices
+3. Create Docker configurations for consistent deployment
+4. Add health checks and monitoring endpoints
+5. Implement proper logging and error tracking
+
+Before implementing, ask me:
+- What environment variables do you need for each stage?
+- How should we handle sensitive data like API keys?
+- Should we implement feature flags for gradual rollouts?
+- What logging levels and formats do you prefer?
+- How do you want to handle database connections and migrations?
+
+Break down configuration into logical modules and explain the security considerations.
+```
+
+### 🌐 Deployment Architecture
+
+**Backend Deployment:**
+
+- **HuggingFace Spaces**: Free hosting with GPU support
+- **Model Storage**: HuggingFace Hub for model artifacts
+- **API Gateway**: Built-in FastAPI with automatic scaling
+
+**Frontend Deployment:**
+
+- **Vercel**: Optimized for Next.js with global CDN
+- **Environment Variables**: Secure configuration management
+- **Custom Domain**: Optional professional branding
+
+**Monitoring & Observability:**
+
+- **Application Metrics**: Response times, error rates, usage patterns
+- **Model Performance**: Inference latency, accuracy metrics
+- **User Analytics**: Conversation patterns, safety incidents
+
+## Phase 7: Testing & Refinement (Day 7)
+
+### 🧪 Cursor Prompt: Comprehensive Testing Suite
+
+**Prompt for Cursor:**
+
+```
+Create a comprehensive testing suite for the DBT therapy chatbot.
+Include unit tests, integration tests, and user acceptance testing.
+
+Requirements:
+1. Implement automated testing for all API endpoints
+2. Create DBT-specific test scenarios and edge cases
+3. Add safety and crisis detection testing
+4. Implement performance and load testing
+5. Create user feedback collection and analysis system
+
+Before implementing, ask me:
+- What specific DBT scenarios should we test?
+- How should we test crisis detection without triggering real alerts?
+- What performance benchmarks should we establish?
+- Should we implement A/B testing for different model versions?
+- How do you want to collect and analyze user feedback?
+- What automated testing tools should we use?
+
+Break down testing into specific test cases and explain the testing strategy for each component.
+```
+
+### 📊 Cursor Prompt: Evaluation & Metrics System
+
+**Prompt for Cursor:**
+
+```
+Create a comprehensive evaluation and metrics system for the DBT chatbot.
+Include both automated metrics and human evaluation frameworks.
+
+Requirements:
+1. Implement conversation quality metrics (empathy, DBT accuracy)
+2. Add safety and bias evaluation tools
+3. Create user satisfaction and feedback analysis
+4. Implement model performance monitoring
+5. Add business metrics and usage analytics
+
+Before implementing, ask me:
+- What specific metrics should we track for therapeutic quality?
+- How should we measure user satisfaction and engagement?
+- What safety metrics are most important to monitor?
+- Should we implement real-time monitoring and alerting?
+- How do you want to handle data privacy in analytics?
+- What reporting and dashboard features do you need?
+
+Provide multiple evaluation approaches and explain how each metric contributes to overall system quality.
+```
+
+### ✅ Testing Checklist
+
+**Functional Testing:**
+
+- [ ] DBT skill application accuracy
+- [ ] Crisis detection and response
+- [ ] Conversation flow and context handling
+- [ ] API endpoint functionality
+- [ ] Error handling and edge cases
+
+**Performance Testing:**
+
+- [ ] Response time under normal load
+- [ ] Memory usage and optimization
+- [ ] Model inference speed
+- [ ] Concurrent user handling
+- [ ] Database query performance
+
+**Safety & Security Testing:**
+
+- [ ] Crisis keyword detection accuracy
+- [ ] Data privacy and security
+- [ ] Input validation and sanitization
+- [ ] Rate limiting and abuse prevention
+- [ ] Legal compliance and disclaimers
+
+**User Experience Testing:**
+
+- [ ] Mobile responsiveness
+- [ ] Accessibility compliance
+- [ ] Cross-browser compatibility
+- [ ] Conversation persistence
+- [ ] Error message clarity
+
+### 📈 Feedback Collection Strategy
+
+**User Testing:**
+
+- 5-10 beta testers with mental health background
+- Structured feedback forms and interviews
+- A/B testing for different response styles
+- Usage analytics and conversation patterns
+
+**Professional Review:**
+
+- Mental health professional evaluation
+- DBT expert review of responses
+- Safety and ethics assessment
+- Legal compliance review
+
+## Cost Breakdown (Minimal Budget)
+
+| Item | Cost |
+
+|------|------|
+
+| Google Colab Pro (optional) | $10 (one month) |
+
+| HuggingFace (hosting) | Free |
+
+| Vercel (frontend) | Free |
+
+| Domain (optional) | $12/year |
+
+| **Total** | **$10-22** |
+
+## Portfolio Presentation Tips
+
+1. **Documentation**: Write clear README with:
+
+   - Problem statement (BPD support need)
+   - Technical approach (LoRA fine-tuning)
+   - DBT methodology explanation
+   - Results and learnings
+
+2. **Demo**: Include screenshots and example conversations
+
+3. **Code Quality**: 
+
+   - Type hints in Python
+   - Clean component structure in React
+   - Comments explaining DBT-specific logic
+
+4. **Ethical Considerations**: 
+
+   - Clear disclaimers
+   - Privacy policy (data handling)
+   - Limitations section
+
+## Safety & Ethical Notes
+
+- **Always** include crisis resources (988 Suicide & Crisis Lifeline)
+- Clear "not a replacement for therapy" messaging
+- Consider data privacy (don't log sensitive conversations)
+- Add rate limiting to prevent abuse
+- Include resources for finding real therapists
+
+## Learning Outcomes
+
+By completing this project, you'll gain:
+
+- ✓ Fine-tuning transformer models with LoRA
+- ✓ Training loop implementation and monitoring
+- ✓ Model deployment and inference optimization
+- ✓ API design for ML applications
+- ✓ Full-stack integration (ML + web)
+- ✓ Ethical AI considerations
+
+## Next Steps After Demo
+
+If you want to continue development:
+
+1. Implement the "patient bot" training loop idea
+2. Add conversation memory/personalization
+3. Integrate mood tracking features
+4. Expand to other therapeutic modalities
+5. Conduct user studies for research
+
+## 🎯 Enhanced Development Workflow
+
+### 📋 Detailed Implementation Checklist
+
+**Phase 1: Environment & Data (Days 1-2)**
+
+- [ ] **Project Setup**: Use Cursor prompt for comprehensive project structure
+- [ ] **Dependencies**: Install with specific versions and environment management
+- [ ] **Data Processing**: Implement tokenization and preprocessing pipeline
+- [ ] **Data Formatting**: Convert conversations to instruction-following format
+- [ ] **DBT Knowledge Extraction**: Extract 2,000-5,000 DBT examples from guidebook
+- [ ] **Data Integration**: Combine general therapy data with DBT-specific examples
+- [ ] **Data Validation**: Quality assessment and DBT accuracy verification
+
+**Phase 2: Model Training (Days 3-4)**
+
+- [ ] **LoRA Configuration**: Set up parameter-efficient fine-tuning
+- [ ] **Training Loop**: Implement with modern optimizations
+- [ ] **Evaluation System**: Create comprehensive metrics and testing
+- [ ] **Model Saving**: Upload to HuggingFace Hub with proper documentation
+
+**Phase 3: Backend Development (Days 4-5)**
+
+- [ ] **API Architecture**: FastAPI with proper structure and error handling
+- [ ] **Memory System**: Context management and session storage
+- [ ] **Safety System**: Crisis detection and appropriate responses
+- [ ] **Model Integration**: Efficient inference and memory management
+- [ ] **Monitoring**: Logging, metrics, and health checks
+
+**Phase 4: Frontend Development (Days 5-6)**
+
+- [ ] **UI Components**: Accessible, therapeutic design system
+- [ ] **Chat Interface**: Responsive conversation flow
+- [ ] **State Management**: Conversation history and persistence
+- [ ] **Safety Features**: Disclaimers and crisis resources
+
+**Phase 5: Deployment & Testing (Days 6-7)**
+
+- [ ] **Backend Deployment**: HuggingFace Spaces with proper configuration
+- [ ] **Frontend Deployment**: Vercel with environment management
+- [ ] **Testing Suite**: Comprehensive automated and manual testing
+- [ ] **User Feedback**: Beta testing and iterative improvement
+
+### 🔄 Cursor Development Style
+
+**For Each Implementation Step:**
+
+1. **Ask Questions First**: Always ask about parameters, preferences, and trade-offs
+2. **Reference Documentation**: Include relevant HuggingFace links and explanations
+3. **Break Down Code**: Write small, explainable chunks with detailed comments
+4. **Provide Options**: Offer multiple approaches with pros/cons
+5. **Explain Decisions**: Why each choice was made and its impact
+6. **Test Incrementally**: Ensure each component works before moving to the next
+
+**Example Cursor Prompt Structure:**
+
+```
+[Component Description] - Reference: [HuggingFace Link]
+
+Requirements:
+1. [Specific requirement 1]
+2. [Specific requirement 2]
+3. [Specific requirement 3]
+
+Before implementing, ask me:
+- [Question about parameter choice]
+- [Question about optimization strategy]
+- [Question about configuration preference]
+
+Break down the implementation into small steps and explain each component.
+```
+
+### 📚 Key Documentation References
+
+**HuggingFace LLM Course Chapter 3 - Complete Fine-tuning Guide:**
+
+- [Chapter 3.1: Introduction](https://huggingface.co/learn/llm-course/chapter3/1) - Fine-tuning fundamentals and overview
+- [Chapter 3.2: Processing the Data](https://huggingface.co/learn/llm-course/chapter3/2) - Data preprocessing, tokenization, and dynamic padding
+- [Chapter 3.3: Fine-tuning with Trainer API](https://huggingface.co/learn/llm-course/chapter3/3) - High-level training with modern best practices
+- [Chapter 3.4: Full Training Loop](https://huggingface.co/learn/llm-course/chapter3/4) - Custom training implementation and optimization
+- [Chapter 3.5: Understanding Learning Curves](https://huggingface.co/learn/llm-course/chapter3/5) - Training monitoring and evaluation
+
+**Essential HuggingFace Resources:**
+
+- [Datasets Documentation](https://huggingface.co/docs/datasets/) - Data processing and management
+- [Tokenizers Summary](https://huggingface.co/docs/transformers/main/en/tokenizer_summary) - Tokenization strategies
+- [Performance Guide](https://huggingface.co/docs/transformers/main/en/performance) - Training optimizations
+- [Training Arguments](https://huggingface.co/docs/transformers/main/en/main_classes/trainer#transformers.TrainingArguments) - Configuration
+- [Evaluation Guide](https://huggingface.co/docs/evaluate/) - Model assessment
+- [PEFT Documentation](https://huggingface.co/docs/peft/) - Parameter-efficient fine-tuning
+- [Accelerate Guide](https://huggingface.co/docs/accelerate/) - Distributed training
+
+**Additional Resources:**
+
+- [Advanced RAG Tokenization](https://huggingface.co/learn/cookbook/en/advanced_rag#tokenization-strategies)
+- [Fine-tuning Code LLM](https://huggingface.co/learn/cookbook/en/fine_tuning_code_llm_on_single_gpu)
+- [Optimizers Documentation](https://huggingface.co/docs/transformers/main/en/optimizers)
+- [Distributed Training](https://huggingface.co/docs/transformers/main/en/perf_train_gpu_many)
