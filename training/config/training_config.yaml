@@ -1,0 +1,111 @@
+# Progressive Multi-Length Training Configuration
+# Optimized for Google Colab Pro with Llama 3.1 8B + LoRA
+# Reference: https://huggingface.co/learn/llm-course/chapter3/1
+
+# Model Configuration
+model:
+  name: "meta-llama/Llama-3.1-8B-Instruct"
+  max_length: 2048
+  temperature: 0.7
+  top_p: 0.9
+
+# Training Configuration - Memory Optimized for Colab Pro
+training:
+  # Memory optimization settings
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 8  # Effective batch size = 8
+  
+  # Learning configuration
+  learning_rate: 2e-4
+  num_train_epochs: 3  # Per run (9 total across 3 runs)
+  warmup_steps: 200
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  
+  # Mixed precision for memory efficiency
+  fp16: true
+  
+  # Evaluation and logging
+  eval_steps: 100
+  save_steps: 500
+  logging_steps: 10
+  evaluation_strategy: "steps"
+  save_strategy: "steps"
+  load_best_model_at_end: true
+  metric_for_best_model: "eval_loss"
+  greater_is_better: false
+
+# LoRA Configuration - Optimized for Colab Pro Memory
+lora:
+  rank: 8  # Reduced from 16 for optimal memory usage (~10GB total)
+  alpha: 16  # Typically 2x rank
+  dropout: 0.1
+  target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+# Quantization Configuration - 4-bit for Memory Efficiency
+quantization:
+  load_in_4bit: true
+  bnb_4bit_compute_dtype: "float16"
+  bnb_4bit_quant_type: "nf4"
+  bnb_4bit_use_double_quant: true
+
+# Memory Optimization Settings
+memory:
+  gradient_checkpointing: true
+  dataloader_pin_memory: false
+  remove_unused_columns: false
+  dataloader_num_workers: 0  # Avoid multiprocessing issues in Colab
+
+# Progressive Training Schedule
+# Updated to use labeled_clean datasets with labels field
+progressive_training:
+  runs:
+    run1_short:
+      dataset_path: "/content/drive/MyDrive/TheraBot_Training/short_context/therapy_dataset"
+      google_drive_source: "data/processed_run1_short_labeled_clean/therapy_dataset"
+      description: "Short exchanges (2-10 exchanges)"
+      epochs: 3
+      expected_time_hours: "2-3"
+      
+    run2_medium:
+      dataset_path: "/content/drive/MyDrive/TheraBot_Training/medium_context/therapy_dataset"
+      google_drive_source: "data/processed_run2_medium_labeled_clean/therapy_dataset"
+      description: "Medium exchanges (6-15 exchanges)"
+      epochs: 3
+      expected_time_hours: "3-4"
+      
+    run3_long:
+      dataset_path: "/content/drive/MyDrive/TheraBot_Training/long_context/therapy_dataset"
+      google_drive_source: "data/processed_run3_long_labeled_clean/therapy_dataset"
+      description: "Long exchanges (12-20 exchanges)"
+      epochs: 3
+      expected_time_hours: "3-4"
+
+# Data Configuration
+data:
+  max_samples: -1  # Use all available data
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+  
+# Output Configuration
+output:
+  output_dir: "./therapy-model-checkpoints"
+  hub_model_id: "therabot-llama-3.1-8b-therapy-lora"  # Private repo
+  push_to_hub: true
+  private: true  # Keep model private during development
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  log_dir: "logs"
+  report_to: ["wandb", "tensorboard"]  # Dual monitoring
+
+# Safety and Privacy
+privacy:
+  google_drive_backup: true
+  encrypt_checkpoints: true
+  delete_cloud_after_download: false  # Keep for backup

@@ -1,0 +1,167 @@
+# HuggingFace Hub Configuration
+# For private model storage and versioning
+# Reference: https://huggingface.co/docs/hub/
+
+# Repository Configuration
+repository:
+  # Private repository settings
+  name: "therabot-llama-3.1-8b-therapy-lora"
+  private: true
+  organization: null  # Use personal account
+  
+  # Model card configuration
+  model_card:
+    language: "en"
+    license: "mit"
+    tags: ["therapy", "dbt", "llama-3.1", "lora", "mental-health"]
+    
+    # Model description
+    description: |
+      TheraBot: A DBT-specialized therapy chatbot fine-tuned from Llama 3.1 8B.
+      This model provides empathetic, evidence-based responses using Dialectical 
+      Behavior Therapy techniques.
+      
+      **⚠️ IMPORTANT DISCLAIMER**: This model is for educational and research 
+      purposes only. It is NOT a replacement for professional therapy or 
+      crisis intervention.
+      
+    # Intended use
+    intended_use: |
+      - Educational research on AI-assisted therapy
+      - DBT skill teaching and validation
+      - Mental health awareness and support
+      - NOT for clinical diagnosis or treatment
+      
+    # Limitations
+    limitations: |
+      - Not a replacement for professional therapy
+      - May not detect all crisis situations
+      - Responses should be reviewed by mental health professionals
+      - Limited to English language
+      - Trained on limited therapy conversation data
+
+# Push Configuration
+push:
+  # Push strategy
+  strategy: "best_checkpoints_only"  # Only push best performing checkpoints
+  
+  # Push triggers
+  triggers:
+    - "best_model"  # Push when new best model is found
+    - "run_completion"  # Push at end of each training run
+    - "final_model"  # Push final model after all runs
+    
+  # Push settings
+  settings:
+    create_pr: false  # Don't create pull requests
+    commit_message_template: "TheraBot training run {run_number}: {description}"
+    
+    # Commit message templates for each run
+    commit_messages:
+      run1: "TheraBot Run 1: Short exchanges training (2-10 exchanges)"
+      run2: "TheraBot Run 2: Medium exchanges training (6-15 exchanges)"
+      run3: "TheraBot Run 3: Long exchanges training (12-20 exchanges)"
+      final: "TheraBot Final Model: Complete progressive training"
+
+# Model Configuration
+model:
+  # Model architecture info
+  architecture: "LlamaForCausalLM"
+  base_model: "meta-llama/Llama-3.1-8B-Instruct"
+  
+  # Fine-tuning details
+  fine_tuning:
+    method: "LoRA (Parameter Efficient Fine-Tuning)"
+    rank: 8
+    alpha: 16
+    target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
+    quantization: "4-bit NF4"
+    
+  # Training details
+  training:
+    datasets: ["therapy-conversations-short", "therapy-conversations-medium", "therapy-conversations-long"]
+    total_examples: "~173,000 therapy dialogue exchanges"
+    epochs: "3 per run (9 total)"
+    learning_rate: "2e-4"
+    batch_size: "1 (effective 8 with gradient accumulation)"
+    
+  # Performance metrics
+  performance:
+    memory_usage: "~10GB GPU memory"
+    training_time: "8-11 hours total"
+    quantization_impact: "95-98% quality retention"
+
+# Safety and Ethics
+safety:
+  # Safety measures
+  measures:
+    - "Crisis keyword detection"
+    - "Harmful content filtering"
+    - "Appropriate disclaimers"
+    - "Resource provision for crisis situations"
+    
+  # Crisis resources
+  crisis_resources:
+    - "988 Suicide & Crisis Lifeline"
+    - "National Suicide Prevention Lifeline"
+    - "Crisis Text Line"
+    - "Emergency services (911)"
+    
+  # Usage guidelines
+  usage_guidelines:
+    - "Always include crisis resources"
+    - "Monitor for harmful content"
+    - "Provide appropriate disclaimers"
+    - "Encourage professional help when needed"
+
+# Privacy and Data Protection
+privacy:
+  # Data handling
+  data_protection:
+    - "No personal information stored"
+    - "Conversations not logged"
+    - "Anonymized training data"
+    - "GDPR compliant"
+    
+  # User rights
+  user_rights:
+    - "Right to delete data"
+    - "Right to access data"
+    - "Right to data portability"
+    - "Right to withdraw consent"
+
+# Version Control
+versioning:
+  # Version strategy
+  strategy: "semantic_versioning"
+  
+  # Version tags
+  tags:
+    run1: "v1.0.0-short"
+    run2: "v1.1.0-medium"
+    run3: "v1.2.0-long"
+    final: "v2.0.0-final"
+    
+  # Release notes template
+  release_notes_template: |
+    ## TheraBot Training Run {run_number}
+    
+    **Conversation Length**: {conversation_length}
+    **Training Examples**: {num_examples}
+    **Epochs**: {epochs}
+    **Final Loss**: {final_loss}
+    **Empathy Score**: {empathy_score}
+    **Safety Score**: {safety_score}
+    
+    ### Changes
+    - Progressive training on {conversation_length} conversations
+    - Improved context adaptation
+    - Enhanced DBT skill application
+    
+    ### Metrics
+    - Training Loss: {train_loss}
+    - Validation Loss: {eval_loss}
+    - Perplexity: {perplexity}
+    - Empathy Score: {empathy_score}
+    - Safety Score: {safety_score}
+    - DBT Skill Usage: {dbt_score}

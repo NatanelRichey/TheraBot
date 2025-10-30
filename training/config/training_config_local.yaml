@@ -1,0 +1,110 @@
+# Local Training Configuration for Cursor/Jupyter
+# Optimized for local GPU training instead of Colab
+
+# Model Configuration
+model:
+  name: "meta-llama/Llama-3.1-8B-Instruct"
+  max_length: 2048
+  temperature: 0.7
+  top_p: 0.9
+
+# Training Configuration - Optimized for Local GPU
+training:
+  # Adjust batch size based on your GPU memory
+  per_device_train_batch_size: 2  # Increase if you have more GPU memory
+  per_device_eval_batch_size: 2
+  gradient_accumulation_steps: 4  # Effective batch size = 8
+  
+  # Learning configuration
+  learning_rate: 2e-4
+  num_train_epochs: 3  # Per run (9 total across 3 runs)
+  warmup_steps: 200
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  
+  # Mixed precision for memory efficiency
+  fp16: true
+  
+  # Evaluation and logging
+  eval_steps: 100
+  save_steps: 500
+  logging_steps: 10
+  evaluation_strategy: "steps"
+  save_strategy: "steps"
+  load_best_model_at_end: true
+  metric_for_best_model: "eval_loss"
+  greater_is_better: false
+
+# LoRA Configuration - Adjust based on your GPU memory
+lora:
+  rank: 16  # Can increase if you have more GPU memory
+  alpha: 32  # Typically 2x rank
+  dropout: 0.1
+  target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+# Quantization Configuration - Optional for local training
+quantization:
+  load_in_4bit: false  # Set to true if you have limited GPU memory
+  bnb_4bit_compute_dtype: "float16"
+  bnb_4bit_quant_type: "nf4"
+  bnb_4bit_use_double_quant: true
+
+# Memory Optimization Settings
+memory:
+  gradient_checkpointing: true
+  dataloader_pin_memory: true  # Can enable for local training
+  remove_unused_columns: false
+  dataloader_num_workers: 2  # Can increase for local training
+
+# Progressive Training Schedule
+progressive_training:
+  runs:
+    run1_short:
+      dataset_path: "data/processed_run1_short_processed/therapy_dataset"
+      description: "Short exchanges (2-10 exchanges)"
+      epochs: 3
+      expected_time_hours: "1-2"  # Faster on local GPU
+      
+    run2_medium:
+      dataset_path: "data/processed_run2_medium_processed/therapy_dataset"
+      description: "Medium exchanges (6-15 exchanges)"
+      epochs: 3
+      expected_time_hours: "2-3"
+      
+    run3_long:
+      dataset_path: "data/processed_run3_long_processed/therapy_dataset"
+      description: "Long exchanges (12-20 exchanges)"
+      epochs: 3
+      expected_time_hours: "2-3"
+
+# Data Configuration
+data:
+  max_samples: -1  # Use all available data
+  train_split: 0.8
+  val_split: 0.1
+  test_split: 0.1
+  
+# Output Configuration
+output:
+  output_dir: "./therapy-model-checkpoints"
+  hub_model_id: "therabot-llama-3.1-8b-therapy-lora-local"  # Local version
+  push_to_hub: false  # Set to true if you want to push to HF Hub
+  private: true
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  log_dir: "logs"
+  report_to: ["wandb", "tensorboard"]  # Both monitoring tools
+
+# Local Training Specific
+local_training:
+  # Set to true if running locally (not Colab)
+  is_local: true
+  # Adjust based on your GPU memory
+  gpu_memory_gb: 16  # Update this to match your GPU
+  # Local checkpoint backup
+  local_backup: true
+  backup_path: "./checkpoint_backups"

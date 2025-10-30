@@ -110,8 +110,12 @@ GPUtil>=1.4.0,<1.5.0
 # =============================================================================
 # Uncomment these for advanced features
 # Vector embeddings and RAG
-# sentence-transformers>=2.2.0,<2.3.0
+sentence-transformers>=2.2.0,<2.3.0
 # langchain>=0.0.300,<0.1.0
+
+# FAISS for RAG vector search (CPU version for development)
+# For deployment, use faiss-cpu in requirements_deploy.txt
+# faiss-cpu>=1.7.4  # Uncomment if running RAG locally
 
 # =============================================================================
 # INSTALLATION NOTES
