@@ -514,8 +514,6 @@ if __name__ == "__main__":
         n_batch = os.getenv("LLAMA_N_BATCH", "128")
         n_ubatch = os.getenv("LLAMA_N_UBATCH", "128")
         # Enable server KV cache (quality-neutral): speeds repeated structure
-        cache_dir = os.path.join(_persistent_root() or ".", "llama_cache")
-        os.makedirs(cache_dir, exist_ok=True)
         cache_size = os.getenv("LLAMA_CACHE_SIZE", "2147483648")  # 2 GiB
         server_cmd = [
             sys.executable, "-m", "llama_cpp.server",
@@ -526,7 +524,7 @@ if __name__ == "__main__":
             "--n_ctx", "2048",
             "--n_batch", n_batch,
             "--n_ubatch", n_ubatch,
-            "--cache", cache_dir,
+            "--cache", "true",
             "--cache_size", cache_size,
             "--chat_format", "llama-3",
             "--n_threads", threads
