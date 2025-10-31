@@ -38,6 +38,7 @@ def _ensure_rag_assets() -> None:
 
     # If both exist, nothing to do (mirror to ./rag if needed)
     if os.path.exists(index_path) and os.path.exists(store_path):
+        print(f"✅ RAG assets detected at: {target_dir}")
         # If assets live in /persistent but code expects `rag/`, ensure symlinks/copies
         if target_dir != "rag":
             os.makedirs("rag", exist_ok=True)
@@ -380,6 +381,17 @@ if __name__ == "__main__":
     
     # Ensure RAG assets; if not present, try to download via RAG_ASSETS_REPO; if still missing, build locally
     _ensure_rag_assets()
+
+    # Optional: force rebuild via env var (e.g., set RAG_REBUILD=1 in Space)
+    if os.getenv("RAG_REBUILD") == "1":
+        print("♻️  RAG_REBUILD=1 set: rebuilding FAISS index and docstore...")
+        try:
+            subprocess.check_call([sys.executable, "rag/build_index.py"]) 
+            print("✅ RAG index rebuilt successfully")
+        except Exception as e:
+            print(f"❌ Failed to rebuild RAG index: {e}")
+        # Re-run ensure to persist/mirror
+        _ensure_rag_assets()
     index_path = "rag/index.faiss"
     store_path = "rag/docstore.json"
     if not (os.path.exists(index_path) and os.path.exists(store_path)):
@@ -391,6 +403,8 @@ if __name__ == "__main__":
             print(f"❌ Failed to build RAG index automatically: {e}")
             print("   Please run: python rag/build_index.py")
             sys.exit(1)
+    else:
+        print("✅ RAG assets available; proceeding")
     
     # Auto-start llama.cpp server for HuggingFace Spaces
     # Check if server is already running
