@@ -214,7 +214,8 @@ class TheraBot:
         
         # Step 1: Retrieve DBT context with RAG
         print(f"\n🔍 Query: {user_message}")
-        results, metadata = self.retriever.retrieve(user_message, k=5)
+        k_env = int(os.getenv("LLAMA_K", "3"))
+        results, metadata = self.retriever.retrieve(user_message, k=k_env)
         chunks = self.retriever.format_results(results, metadata)
         
         # Log retrieval metadata
@@ -228,6 +229,10 @@ class TheraBot:
         
         # Step 2: Build prompts with context
         system_msg, user_msg = build_rag_prompt(user_message, chunks)
+        # Cap prompt size to reduce first-token latency on CPU tiers
+        prompt_cap = int(os.getenv("PROMPT_CAP", "1500"))
+        if len(user_msg) > prompt_cap:
+            user_msg = user_msg[:prompt_cap]
         print(f"   📝 Prompts built ({len(system_msg)+len(user_msg)} chars)")
         
         # Step 3: Call llama.cpp server
@@ -506,12 +511,17 @@ if __name__ == "__main__":
         print(f"\n🚀 Starting llama.cpp server...")
         # Choose a sensible default for threads; allow override via env
         threads = os.getenv("LLAMA_THREADS") or str(max(2, min(8, (os.cpu_count() or 2))))
+        n_batch = os.getenv("LLAMA_N_BATCH", "128")
+        n_ubatch = os.getenv("LLAMA_N_UBATCH", "128")
         server_cmd = [
             sys.executable, "-m", "llama_cpp.server",
             "--model", model_path,
+            "--model_alias", "therabot",
             "--host", "0.0.0.0",
             "--port", "8000",
             "--n_ctx", "2048",
+            "--n_batch", n_batch,
+            "--n_ubatch", n_ubatch,
             "--chat_format", "llama-3",
             "--n_threads", threads
         ]
