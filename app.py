@@ -214,7 +214,7 @@ class TheraBot:
         
         # Step 1: Retrieve DBT context with RAG
         print(f"\n🔍 Query: {user_message}")
-        k_env = int(os.getenv("LLAMA_K", "3"))
+        k_env = int(os.getenv("LLAMA_K", "5"))
         results, metadata = self.retriever.retrieve(user_message, k=k_env)
         chunks = self.retriever.format_results(results, metadata)
         
@@ -230,7 +230,7 @@ class TheraBot:
         # Step 2: Build prompts with context
         system_msg, user_msg = build_rag_prompt(user_message, chunks)
         # Cap prompt size to reduce first-token latency on CPU tiers
-        prompt_cap = int(os.getenv("PROMPT_CAP", "1500"))
+        prompt_cap = int(os.getenv("PROMPT_CAP", "3000"))
         if len(user_msg) > prompt_cap:
             user_msg = user_msg[:prompt_cap]
         print(f"   📝 Prompts built ({len(system_msg)+len(user_msg)} chars)")
@@ -513,6 +513,10 @@ if __name__ == "__main__":
         threads = os.getenv("LLAMA_THREADS") or str(max(2, min(8, (os.cpu_count() or 2))))
         n_batch = os.getenv("LLAMA_N_BATCH", "128")
         n_ubatch = os.getenv("LLAMA_N_UBATCH", "128")
+        # Enable server KV cache (quality-neutral): speeds repeated structure
+        cache_dir = os.path.join(_persistent_root() or ".", "llama_cache")
+        os.makedirs(cache_dir, exist_ok=True)
+        cache_size = os.getenv("LLAMA_CACHE_SIZE", "2147483648")  # 2 GiB
         server_cmd = [
             sys.executable, "-m", "llama_cpp.server",
             "--model", model_path,
@@ -522,6 +526,8 @@ if __name__ == "__main__":
             "--n_ctx", "2048",
             "--n_batch", n_batch,
             "--n_ubatch", n_ubatch,
+            "--cache", cache_dir,
+            "--cache_size", cache_size,
             "--chat_format", "llama-3",
             "--n_threads", threads
         ]
@@ -594,4 +600,23 @@ if __name__ == "__main__":
         server_port=7860,
         share=False
     )
+
+    # Optional keep-warm pings for ZeroGPU to reduce cold-idle latency
+    try:
+        if os.getenv("ZERO_GPU_KEEP_WARM") == "1":
+            import threading
+            import time as _time
+            interval = int(os.getenv("ZERO_GPU_KEEP_WARM_SECS", "120"))
+            def _keep_warm():
+                while True:
+                    try:
+                        requests.get("http://localhost:8000/v1/models", timeout=2)
+                    except Exception:
+                        pass
+                    _time.sleep(interval)
+            t = threading.Thread(target=_keep_warm, daemon=True)
+            t.start()
+            print(f"🔁 ZeroGPU keep-warm enabled (every {interval}s)")
+    except Exception:
+        pass
 
