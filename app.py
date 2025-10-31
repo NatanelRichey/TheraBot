@@ -405,6 +405,22 @@ if __name__ == "__main__":
             sys.exit(1)
     else:
         print("✅ RAG assets available; proceeding")
+
+    # Always log where we expect the files and whether they exist
+    try:
+        abs_index = os.path.abspath(index_path)
+        abs_store = os.path.abspath(store_path)
+        print("🔎 RAG file check:")
+        print(f"   index.faiss → {abs_index}   exists={os.path.exists(index_path)}")
+        print(f"   docstore.json → {abs_store}   exists={os.path.exists(store_path)}")
+        persistent = _persistent_root()
+        if persistent:
+            p_idx = os.path.join(persistent, "rag", "index.faiss")
+            p_sto = os.path.join(persistent, "rag", "docstore.json")
+            print(f"   persistent index.faiss → {p_idx}   exists={os.path.exists(p_idx)}")
+            print(f"   persistent docstore.json → {p_sto}   exists={os.path.exists(p_sto)}")
+    except Exception as _e:
+        pass
     
     # Auto-start llama.cpp server for HuggingFace Spaces
     # Check if server is already running
