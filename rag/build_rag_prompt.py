@@ -77,7 +77,17 @@ CRITICAL GUIDELINES:
 - Always prioritize: validation, empathy, and natural conversation flow
 - Be concrete and practical in your suggestions
 - It's better to give a good response from training than a forced response from context
-- If you're unsure about using context, DON'T use it"""
+- If you're unsure about using context, DON'T use it
+- NEVER repeat or rephrase the user's question back to them
+- NEVER start with phrases like "You're asking about..." or "You want to know..."
+- Respond directly and naturally without echoing what they said
+
+CONVERSATION TONE:
+- Keep the FIRST 5-10 exchanges LIGHT, warm, and conversational
+- Unless there's a SEVERE CRISIS (suicidal thoughts, self-harm, immediate danger), don't dive deep
+- Build rapport gradually through validation and casual check-ins
+- Only move to deeper therapeutic work after establishing trust and connection
+- Use your judgment: if someone shares something serious, respond appropriately, but start gentle"""
 
     # Format context from chunks
     dbt_context = format_dbt_context(retrieved_chunks)
@@ -94,18 +104,18 @@ CRITICAL GUIDELINES:
 
 ---
 
-User's Question: {user_query}
+The user said: {user_query}
 
 Respond naturally and compassionately:
-1. FIRST: Validate the user's experience
-2. THEN: Check if any DBT context above is truly relevant to the question
+1. FIRST: Validate their experience
+2. THEN: Check if any DBT context above is truly relevant
    - If YES and context is clear: Incorporate it naturally
    - If NO or context is unclear: Ignore context, use your training
 3. FINALLY: Offer concrete, practical suggestions
 4. REMEMBER: Natural conversation > forced context usage"""
     else:
         # Without RAG context (casual/positive queries)
-        user_prompt = f"""User's Question: {user_query}
+        user_prompt = f"""The user said: {user_query}
 
 Provide a warm, compassionate response using your DBT training."""
     

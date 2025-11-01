@@ -319,14 +319,15 @@ def create_gradio_interface():
         
         chatbot = gr.Chatbot(
             label="Conversation",
-            height=500,
+            height=None,  # Auto-fit to window
             show_label=True,
-            type="messages"
+            type="messages",
+            container=True
         )
         
         msg = gr.Textbox(
             label="Your Message",
-            placeholder="Type your message here...",
+            placeholder="Type your message here... (Press Enter to submit, Alt+Enter for new line)",
             lines=2
         )
         
@@ -337,6 +338,8 @@ def create_gradio_interface():
         # Event handlers
         def respond(message, history):
             """Process message and return updated history."""
+            print(f"DEBUG: received message: {message[:50]}")
+            
             # Convert messages format to tuples for bot.chat (legacy support)
             tuple_history = []
             if history:
@@ -346,23 +349,43 @@ def create_gradio_interface():
                     else:
                         tuple_history.append(h)
             
+            # Call bot.chat to generate response
             new_tuple_history, _ = bot.chat(message, tuple_history)
-            # Convert back to messages format - get the last exchange (user message + bot response)
-            # bot.chat returns tuples as (user_message, bot_response) pairs
-            messages_to_add = []
-            if len(new_tuple_history) > len(tuple_history):
-                # Get the newly added exchange (last entry)
+            
+            # Get the last exchange (should always be the new one bot.chat added)
+            if new_tuple_history and len(new_tuple_history) > 0:
                 last_exchange = new_tuple_history[-1]
                 if isinstance(last_exchange, tuple) and len(last_exchange) == 2:
                     user_msg, bot_msg = last_exchange
-                    messages_to_add = [
+                    # Append new messages to history
+                    return history + [
                         {"role": "user", "content": user_msg},
                         {"role": "assistant", "content": bot_msg}
-                    ]
-            return history + messages_to_add, ""
+                    ], ""
+            
+            return history, ""
         
-        msg.submit(respond, [msg, chatbot], [chatbot, msg])
-        submit_btn.click(respond, [msg, chatbot], [chatbot, msg])
+        # Chain: user adds message immediately, then bot responds
+        def user_then_bot(message, history):
+            """Add user message then trigger bot response."""
+            new_history = history + [{"role": "user", "content": message}]
+            return new_history
+        
+        def bot_response_from_history(history):
+            """Generate bot response from history."""
+            # Get last user message and pass to respond
+            if history and history[-1].get("role") == "user":
+                last_user_msg = history[-1]["content"]
+                history_minus_user = history[:-1]
+                return respond(last_user_msg, history_minus_user)
+            return history, ""
+        
+        msg.submit(user_then_bot, [msg, chatbot], chatbot, queue=False).then(
+            bot_response_from_history, chatbot, [chatbot, msg]
+        )
+        submit_btn.click(user_then_bot, [msg, chatbot], chatbot, queue=False).then(
+            bot_response_from_history, chatbot, [chatbot, msg]
+        )
         clear_btn.click(lambda: ([], ""), outputs=[chatbot, msg])
         
         # Examples
@@ -511,10 +534,33 @@ if __name__ == "__main__":
         print(f"\n🚀 Starting llama.cpp server...")
         # Choose a sensible default for threads; allow override via env
         threads = os.getenv("LLAMA_THREADS") or str(max(2, min(8, (os.cpu_count() or 2))))
-        n_batch = os.getenv("LLAMA_N_BATCH", "128")
-        n_ubatch = os.getenv("LLAMA_N_UBATCH", "128")
-        # Enable server KV cache (quality-neutral): speeds repeated structure
         cache_size = os.getenv("LLAMA_CACHE_SIZE", "2147483648")  # 2 GiB
+        
+        # Detect GPU and optimize for it
+        n_gpu_layers = os.getenv("LLAMA_N_GPU_LAYERS", "0")
+        
+        # Default batch sizes (CPU-conservative)
+        default_n_batch = "128"
+        default_n_ubatch = "128"
+        
+        try:
+            import torch
+            if torch.cuda.is_available():
+                # Use all GPU layers for maximum speed
+                n_gpu_layers = os.getenv("LLAMA_N_GPU_LAYERS", "35")
+                # Increase batch sizes for GPU (especially A100)
+                default_n_batch = "2048"  # Much larger for GPU
+                default_n_ubatch = "2048"
+                print(f"   GPU detected: {torch.cuda.get_device_name(0)}")
+                print(f"   Using {n_gpu_layers} GPU layers for acceleration")
+                print(f"   GPU-optimized batch sizes: {default_n_batch}/{default_n_ubatch}")
+        except ImportError:
+            pass
+        
+        # Allow environment variable override, but use GPU defaults if no override
+        n_batch = os.getenv("LLAMA_N_BATCH", default_n_batch)
+        n_ubatch = os.getenv("LLAMA_N_UBATCH", default_n_ubatch)
+        
         server_cmd = [
             sys.executable, "-m", "llama_cpp.server",
             "--model", model_path,
@@ -524,6 +570,7 @@ if __name__ == "__main__":
             "--n_ctx", "2048",
             "--n_batch", n_batch,
             "--n_ubatch", n_ubatch,
+            "--n_gpu_layers", str(n_gpu_layers),
             "--cache", "true",
             "--cache_size", cache_size,
             "--chat_format", "llama-3",
@@ -596,7 +643,7 @@ if __name__ == "__main__":
     demo.launch(
         server_name="0.0.0.0",  # Allow external access
         server_port=7860,
-        share=False
+        share=True
     )
 
     # Optional keep-warm pings for ZeroGPU to reduce cold-idle latency
